@@ -18,6 +18,7 @@ msg = "Welcome to Blum! 🎉🎉🎉nnAt Blum, we are building a decentralized e
 @command_router.message(CommandStart())
 async def start_handler(message: Message):
     
+    
     params = message.text[10:]
     if params:
         authenticate_response = session.post('https://azizbekaliyev.uz/api/v1/authenticate/enter/', json={
@@ -28,18 +29,28 @@ async def start_handler(message: Message):
         })
         
         # Check the response
+        if authenticate_response.status_code == 201:
+            await message.answer(
+                text="Welcome, to MoneyCoin 🎉🎉🎉"
+            )
+
+            data = requests.post(f"https://azizbekaliyev.uz/api/v1/authenticate/invite/{params}/{message.from_user.id}/")
+
+            if data.status_code == 201:
+                print("successfully_invited")
+            else:
+                print("User already invited.")
+
         if authenticate_response.status_code == 200:
-            print("Authentication successful")
+            await message.answer(text="Welcome back !")
         else:
             print(f"Failed to authenticate. Status code: {authenticate_response.status_code}")
 
-        data = requests.post(f"https://azizbekaliyev.uz/api/v1/authenticate/invite/{params}/{message.from_user.id}/")
-
-        if data.status_code == 201:
-            print("successfully_invited")
-        else:
-            print("User already invited.")
-
+        if params == str(message.from_user.id):
+            await message.answer(
+                "You can't invite yourself."
+            )
+            
     user_photos = await bot.get_user_profile_photos(message.from_user.id)
 
     if user_photos.total_count > 0:
@@ -57,7 +68,7 @@ async def start_handler(message: Message):
 
     # Create InlineKeyboardMarkup
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Launch Blum", web_app=WebAppInfo(url=url))],
+        [InlineKeyboardButton(text="Launch Moneycoin 💸💸💸", web_app=WebAppInfo(url=url))],
         [InlineKeyboardButton(text="Join Community", url="https://t.me/azizbek_channnel")]
     ])
 
